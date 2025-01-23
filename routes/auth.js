@@ -3,6 +3,7 @@ const router = express.Router();
 const { User } = require("../model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 
 // Function to handle user signup
 router.post("/signup", async (req, res) => {
@@ -43,6 +44,30 @@ router.post("/signup", async (req, res) => {
     res.json({ message: "unexpected error" });
     return;
   }
+
+  // send welcome email ()
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.MAILER_USER,
+      pass: process.env.MAILER_PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    from: "kylian.patry@gmail.com",
+    to: user.email,
+    subject: "Welcome to E-SAUCISSE !",
+    text: "You just create an account on the best eshop of the world ^^",
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(info);
+    }
+  });
 });
 
 // Function to handle user login
