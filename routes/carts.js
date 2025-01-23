@@ -60,7 +60,7 @@ router.post("/add-product", async function (req, res) {
     }
 
     let productInCart = null;
-    if (cart.Products.length > 0) {
+    if (cart.Products && cart.Products.length > 0) {
       productInCart = await ProductInCart.findOne({
         where: { CartId: cart.id, ProductId: productId },
       });

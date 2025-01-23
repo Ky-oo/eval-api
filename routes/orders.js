@@ -81,6 +81,10 @@ router.post("/", async function (req, res) {
       await product.update({ stock: newQuantity });
 
       totalCost += product.price * cartProduct.quantity;
+
+      product.popularity =
+        product.popularity !== null ? product.popularity + 10 : 10;
+      product.save();
     }
 
     const order = await Order.create({
@@ -94,6 +98,9 @@ router.post("/", async function (req, res) {
     if (!order) {
       return res.status(500).json({ message: "Server error", error });
     }
+
+    cart.destroy();
+
     return res.status(200).json(order);
   } catch (error) {
     console.log(error);

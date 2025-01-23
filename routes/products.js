@@ -37,25 +37,24 @@ router.get("/", async function (req, res) {
       }
     }
 
-    const include = [
-      {
-        model: Tag,
-        as: "Tags",
-        attributes: ["name"],
-        through: { attributes: [] },
-      },
-    ];
+    const include = {
+      model: Tag,
+      as: "Tags",
+      attributes: ["name"],
+      through: { attributes: [] },
+    };
 
     if (tags) {
-      include[0].where = { id: { [Op.in]: tags.split(",") } };
+      include.where = { id: { [Op.in]: tags.split(",") } };
     }
 
     const products = await Product.findAll({
-      attributes: ["id", "name", "price"],
+      attributes: ["id", "name", "price", "popularity"],
       where: where,
       limit: nbDisplayed ? parseInt(nbDisplayed) : 10,
       offset: nbDisplayed ? pages * parseInt(nbDisplayed) : undefined,
       include: include,
+      order: [["popularity", "DESC"]],
     });
 
     res.status(200).json(products);
@@ -83,6 +82,12 @@ router.get("/:id", async function (req, res) {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
+
+    // Update popularity
+    product.popularity =
+      product.popularity !== null ? product.popularity + 1 : 1;
+    product.save();
+
     res.status(200).json(product);
   } catch (error) {
     console.error(error);

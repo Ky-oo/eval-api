@@ -14,7 +14,7 @@ router.get("/", async function (req, res) {
   }
 });
 
-// Route to get a single user by its ID
+// Route to get a single user by ID
 router.get("/:id", async function (req, res) {
   try {
     const { id } = req.params;

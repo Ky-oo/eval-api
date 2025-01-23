@@ -12,7 +12,13 @@ router.post("/products/", async function (req, res) {
         .status(400)
         .json({ message: "Name, price, description and stock are required" });
     }
-    const product = await Product.create({ name, price, description, stock });
+    const product = await Product.create({
+      name,
+      price,
+      description,
+      stock,
+      popularity: 0,
+    });
     res.status(201).json(product);
   } catch (error) {
     console.error(error);
@@ -25,15 +31,19 @@ router.put("/products/:id", async function (req, res) {
   try {
     const { id } = req.params;
     const { name, price, description, stock } = req.body;
+
     const product = await Product.findByPk(id);
+
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
+
     product.name = name;
     product.price = price;
     product.description = description;
     product.stock = stock;
     product.save();
+
     res.status(200).json(product);
   } catch (error) {
     console.error(error);
