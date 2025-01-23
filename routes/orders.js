@@ -1,7 +1,9 @@
 var express = require("express");
 var router = express.Router();
 
+const bcrypt = require("bcrypt");
 const { Order, Cart, User } = require("../model");
+const jwt = require("jsonwebtoken");
 
 router.get("/:id", async function (req, res) {
   try {
@@ -100,10 +102,36 @@ router.post("/", async function (req, res) {
 router.get("/user/:id", async function (req, res) {
   try {
     const { id } = req.params;
-    console.log(req.headers["userId"]);
-    if (id !== req.headers["userId"]) {
-      res.status(400).json({ message: "This is not your order" });
+    const token = req.headers["authorization"].split(" ")[1];
+
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
     }
+
+    jwt.verify(token, process.env.JWT_PRIVATE_KEY, async (err, decoded) => {
+      if (err) {
+        return res
+          .status(500)
+          .json({ message: "Failed to authenticate token" });
+      }
+
+      if (decoded.id !== parseInt(id, 10)) {
+        return res.status(400).json({ message: "This is not your order" });
+      }
+
+      const orders = await Order.findAll({ where: { UserId: id } });
+
+      if (!orders || orders.length === 0) {
+        return res.status(404).json({ message: "Orders not found" });
+      }
+
+      let totalCost = 0;
+      orders.forEach((order) => {
+        totalCost += order.cost;
+      });
+
+      return res.status(200).json({ order: orders, totalCost: totalCost });
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Server error", error });
