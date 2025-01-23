@@ -3,6 +3,7 @@ var router = express.Router();
 
 const { Product, Order, Tag } = require("../model");
 
+// Create a new product
 router.post("/products/", async function (req, res) {
   try {
     const { name, price, description, stock } = req.body;
@@ -19,6 +20,7 @@ router.post("/products/", async function (req, res) {
   }
 });
 
+// Update an existing product by ID
 router.put("/products/:id", async function (req, res) {
   try {
     const { id } = req.params;
@@ -39,6 +41,7 @@ router.put("/products/:id", async function (req, res) {
   }
 });
 
+// Delete a product by ID
 router.delete("/products/:id", async function (req, res) {
   try {
     const { id } = req.params;
@@ -54,6 +57,7 @@ router.delete("/products/:id", async function (req, res) {
   }
 });
 
+// Add a tag to a product by product ID
 router.post("/products/:id/tags", async function (req, res) {
   try {
     const { id } = req.params;
@@ -74,6 +78,7 @@ router.post("/products/:id/tags", async function (req, res) {
   }
 });
 
+// Remove a tag from a product by product ID and tag ID
 router.delete("products/:id/tags/:tagId", async function (req, res) {
   try {
     const { id, tagId } = req.params;
@@ -89,6 +94,7 @@ router.delete("products/:id/tags/:tagId", async function (req, res) {
   }
 });
 
+// Create a new user
 router.post("/users/", async function (req, res) {
   try {
     const { email, password, display_name, name, is_admin } = req.body;
@@ -111,6 +117,7 @@ router.post("/users/", async function (req, res) {
   }
 });
 
+// Create a new tag
 router.post("/tags/", async function (req, res) {
   try {
     const { name } = req.body;
@@ -132,6 +139,7 @@ router.post("/tags/", async function (req, res) {
   }
 });
 
+// Delete a tag by ID
 router.delete("/tags/:id", async function (req, res) {
   const id = req.params.id;
 
@@ -144,6 +152,7 @@ router.delete("/tags/:id", async function (req, res) {
   return res.status(201).json();
 });
 
+// Get all orders
 router.get("/orders/", async function (req, res) {
   const orders = Order.findAll();
   return res.status(200).json(orders);

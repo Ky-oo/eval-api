@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const { Order, Cart, User } = require("../model");
 const jwt = require("jsonwebtoken");
 
+// Function to get an order by order ID
 router.get("/:id", async function (req, res) {
   try {
     const { id } = req.params;
@@ -22,6 +23,7 @@ router.get("/:id", async function (req, res) {
   }
 });
 
+// Function to create a new order
 router.post("/", async function (req, res) {
   try {
     const { deliveryAddress, cartId, userId } = req.body;
@@ -99,6 +101,7 @@ router.post("/", async function (req, res) {
   }
 });
 
+// Function to get all orders of a user by user ID
 router.get("/user/:id", async function (req, res) {
   try {
     const { id } = req.params;

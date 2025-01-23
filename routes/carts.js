@@ -3,6 +3,7 @@ var router = express.Router();
 
 const { Product, ProductInCart, Cart, User } = require("../model");
 
+// Function to get the cart of a user by user ID
 router.get("/:id", async function (req, res) {
   try {
     const { id } = req.params;
@@ -27,6 +28,7 @@ router.get("/:id", async function (req, res) {
   }
 });
 
+// Function to add a product to the cart
 router.post("/add-product", async function (req, res) {
   try {
     const { userId, productId } = req.body;
@@ -88,6 +90,7 @@ router.post("/add-product", async function (req, res) {
   }
 });
 
+// Function to remove a product from the cart
 router.delete("/:id/product/:productId", async function (req, res) {
   try {
     const { id, productId } = req.params;

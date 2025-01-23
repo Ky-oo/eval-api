@@ -3,7 +3,8 @@ var router = express.Router();
 
 const { Tag } = require("../model");
 
-router.get("/", async function (res, res) {
+// Route to get a list of all tags
+router.get("/", async function (req, res) {
   try {
     const tags = await Tag.findAll();
     res.status(200).json(tags);
@@ -13,6 +14,7 @@ router.get("/", async function (res, res) {
   }
 });
 
+// Route to get a single tag by its ID
 router.get("/:id", async function (req, res) {
   try {
     const { id } = req.params;

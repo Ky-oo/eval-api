@@ -1,5 +1,12 @@
 const jwt = require("jsonwebtoken");
 
+// Middleware function to verify JWT token
+// Extracts token from the Authorization header
+// Verifies the token using the secret key
+// Sets req.user_id if the token is valid
+// Responds with appropriate error messages if the token is invalid or expired
+// Proceeds to the next middleware if the user is an admin if the token is good
+
 function verifyToken(req, res, next) {
   if (req.headers.authorization) {
     const token = req.headers.authorization.split(" ")[1];

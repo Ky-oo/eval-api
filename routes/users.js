@@ -3,6 +3,7 @@ var router = express.Router();
 
 const { User } = require("../model");
 
+// Route to get a list of all users
 router.get("/", async function (req, res) {
   try {
     const users = await User.findAll();
@@ -13,6 +14,7 @@ router.get("/", async function (req, res) {
   }
 });
 
+// Route to get a single user by its ID
 router.get("/:id", async function (req, res) {
   try {
     const { id } = req.params;
@@ -27,6 +29,7 @@ router.get("/:id", async function (req, res) {
   }
 });
 
+// Route to update a user by its ID
 router.put("/:id", async function (req, res) {
   try {
     const { id } = req.params;
@@ -48,6 +51,7 @@ router.put("/:id", async function (req, res) {
   }
 });
 
+// Route to delete a user by its ID
 router.delete("/:id", async function (req, res) {
   try {
     const { id } = req.params;

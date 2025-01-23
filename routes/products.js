@@ -5,6 +5,7 @@ const { Product, Tag } = require("../model");
 const Sequelize = require("sequelize");
 const { Op } = Sequelize;
 
+// Route to get a list of products with optional pagination and filtering by tags
 router.get("/", async function (req, res) {
   try {
     const nbDisplayed = req.query.pagination;
@@ -64,6 +65,7 @@ router.get("/", async function (req, res) {
   }
 });
 
+// Route to get a single product by its ID
 router.get("/:id", async function (req, res) {
   try {
     const { id } = req.params;

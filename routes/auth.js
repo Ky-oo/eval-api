@@ -4,6 +4,7 @@ const { User } = require("../model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
+// Function to handle user signup
 router.post("/signup", async (req, res) => {
   const { email, password, display_name, name, is_admin } = req.body;
   if (!email || !password || !display_name || !name) {
@@ -14,6 +15,7 @@ router.post("/signup", async (req, res) => {
     return;
   }
 
+  // Create the user
   const user = await User.build({
     email: email,
     password: password,
@@ -22,6 +24,7 @@ router.post("/signup", async (req, res) => {
     is_admin: is_admin || false,
   });
 
+  // validate email field
   try {
     await user.validate({ fields: ["email"] });
   } catch (error) {
@@ -30,6 +33,7 @@ router.post("/signup", async (req, res) => {
     return;
   }
 
+  // save the user
   try {
     await user.save();
     res.json(user);
@@ -41,6 +45,7 @@ router.post("/signup", async (req, res) => {
   }
 });
 
+// Function to handle user login
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -49,6 +54,7 @@ router.post("/login", async (req, res) => {
     return;
   }
 
+  // Find user
   const user = await User.findOne({ where: { email: email } });
   if (!user) {
     res.status(404);
@@ -56,6 +62,7 @@ router.post("/login", async (req, res) => {
     return;
   }
 
+  // Check password
   const passwordOk = await bcrypt.compare(password, user.password);
 
   try {
@@ -68,6 +75,7 @@ router.post("/login", async (req, res) => {
     const tokenDuration =
       req.headers["user-agent"] === "LocalTerminal" ? "1h" : "30d";
 
+    // Create token
     try {
       const token = jwt.sign(
         { id: user.id, is_admin: user.is_admin },
