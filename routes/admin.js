@@ -1,47 +1,52 @@
 var express = require("express");
 var router = express.Router();
 
-const { Tag } = require("../model");
+const { Product, Order, Tag } = require("../model");
 
-router.post("/product/", async function (req, res) {
+router.post("/products/", async function (req, res) {
   try {
-    const { name } = req.body;
-    if (!name) {
-      return res.status(400).json({ message: "Name is required" });
+    const { name, price, description, stock } = req.body;
+    if (!name || !price || !description || !stock) {
+      return res
+        .status(400)
+        .json({ message: "Name, price, description and stock are required" });
     }
-    const tag = await Tag.create({ name });
-    res.status(201).json(tag);
+    const product = await Product.create({ name, price, description, stock });
+    res.status(201).json(product);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error", error });
   }
 });
 
-router.put("/product/:id", async function (req, res) {
+router.put("/products/:id", async function (req, res) {
   try {
     const { id } = req.params;
-    const { name } = req.body;
-    const tag = await Tag.findByPk(id);
-    if (!tag) {
-      return res.status(404).json({ message: "Tag not found" });
+    const { name, price, description, stock } = req.body;
+    const product = await Product.findByPk(id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
     }
-    tag.name = name;
-    tag.save();
-    res.status(200).json(tag);
+    product.name = name;
+    product.price = price;
+    product.description = description;
+    product.stock = stock;
+    product.save();
+    res.status(200).json(product);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error", error });
   }
 });
 
-router.delete("/product/:id", async function (req, res) {
+router.delete("/products/:id", async function (req, res) {
   try {
     const { id } = req.params;
-    const tag = await Tag.findByPk(id);
-    if (!tag) {
-      return res.status(404).json({ message: "Tag not found" });
+    const product = await Product.findByPk(id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
     }
-    tag.destroy();
+    product.destroy();
     res.status(204).json();
   } catch (error) {
     console.error(error);
@@ -49,7 +54,42 @@ router.delete("/product/:id", async function (req, res) {
   }
 });
 
-router.post("/admin/", async function (req, res) {
+router.post("/products/:id/tags", async function (req, res) {
+  try {
+    const { id } = req.params;
+    const { tagId } = req.body;
+    const product = await Product.findByPk(id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    if (!tagId) {
+      return res.status(400).json({ message: "Tag id is required" });
+    }
+
+    await product.addTag(tagId);
+    res.status(200).json(product);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+router.delete("products/:id/tags/:tagId", async function (req, res) {
+  try {
+    const { id, tagId } = req.params;
+    const product = await Product.findByPk(id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    await product.removeTag(tagId);
+    res.status(204).json();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+router.post("/users/", async function (req, res) {
   try {
     const { email, password, display_name, name, is_admin } = req.body;
     if (!email || !password || !display_name || !name) {
@@ -69,6 +109,44 @@ router.post("/admin/", async function (req, res) {
     console.error(error);
     res.status(500).json({ message: "Server error", error });
   }
+});
+
+router.post("/tags/", async function (req, res) {
+  try {
+    const { name } = req.body;
+
+    if (!name) {
+      res.status(400).json({ message: "Name is required" });
+    }
+
+    const tag = await Tag.create({ name });
+
+    if (!tag) {
+      return res.status(500).json({ message: "Server error", error });
+    }
+
+    return res.status(201).json(tag);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error", error });
+  }
+});
+
+router.delete("/tags/:id", async function (req, res) {
+  const id = req.params.id;
+
+  const tag = await Tag.findByPk(id);
+
+  if (!tag) {
+    return res.status(404).json({ message: "Tag not found", error });
+  }
+  await tag.destroy();
+  return res.status(201).json();
+});
+
+router.get("/orders/", async function (req, res) {
+  const orders = Order.findAll();
+  return res.status(200).json(orders);
 });
 
 module.exports = router;

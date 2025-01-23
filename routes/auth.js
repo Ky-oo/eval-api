@@ -56,8 +56,9 @@ router.post("/login", async (req, res) => {
     return;
   }
 
+  const passwordOk = await bcrypt.compare(password, user.password);
+
   try {
-    const passwordOk = await bcrypt.compare(password, user.password);
     if (!passwordOk) {
       res.status(404).json({ message: "Email or password incorrect" });
       return;
@@ -65,7 +66,7 @@ router.post("/login", async (req, res) => {
 
     // Check if the user is using the local terminal to determine the token duration
     const tokenDuration =
-      req.headers["user-agent"] === "LocalTerminal/7.26.8" ? "1h" : "30d";
+      req.headers["user-agent"] === "LocalTerminal" ? "1h" : "30d";
 
     try {
       const token = jwt.sign(

@@ -12,6 +12,8 @@ var usersRouter = require("./routes/users");
 var productsRouter = require("./routes/products");
 var tagsRouter = require("./routes/tags");
 var adminRouter = require("./routes/admin");
+var cartRouter = require("./routes/carts");
+var orderRouter = require("./routes/orders");
 
 var verifyToken = require("./middleware/verify_jwt_token");
 var verifyIsAdmin = require("./middleware/verify_is_admin");
@@ -23,12 +25,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/auth", authRouter);
-
-app.use(verifyToken);
-
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/products", productsRouter);
+
+app.use(verifyToken);
+
+app.use("/carts", cartRouter);
+app.use("/orders", orderRouter);
 
 app.use(verifyIsAdmin);
 

@@ -15,8 +15,11 @@ Product.belongsToMany(Cart, { through: ProductInCart });
 Order.belongsTo(Cart);
 Cart.hasMany(Order);
 
-Product.belongsToMany(Tag, { through: "ProductTag" });
-Tag.belongsToMany(Product, { through: "ProductTag" });
+Product.belongsToMany(Tag, { through: "ProductTag", as: "Tags" });
+Tag.belongsToMany(Product, { through: "ProductTag", as: "Products" });
+
+Order.belongsTo(User);
+User.hasMany(Order);
 
 //sequelize.sync({ alter: true });
 
