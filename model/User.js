@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 
 const sequelize = require("../orm");
+const bcrypt = require("bcrypt");
 
 const User = sequelize.define("User", {
   email: {
@@ -29,10 +30,14 @@ const User = sequelize.define("User", {
     type: DataTypes.STRING(255),
     allowNull: false,
   },
+  is_admin: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
 });
 
 User.beforeCreate(async (user) => {
-  user.password = user.password;
+  user.password = await bcrypt.hash(user.password, 10);
 });
 
 module.exports = User;
