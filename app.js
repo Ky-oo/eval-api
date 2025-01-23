@@ -28,6 +28,9 @@ var app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Define cron
+require("./utils/cron");
+
 // Define routes
 app.use("/auth", authRouter);
 app.use("/", indexRouter);
