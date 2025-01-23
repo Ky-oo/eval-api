@@ -1,19 +1,13 @@
 var express = require("express");
 var router = express.Router();
 
-const { Product, ProductInCart, Cart, User } = require("../model");
+const { Product, ProductInCart, Cart } = require("../model");
 
-// Function to get the cart of a user by user ID
-router.get("/:id", async function (req, res) {
+// Function to get the cart of a user by is sessionToken
+router.get("/my-cart", async function (req, res) {
   try {
-    const { id } = req.params;
-    const user = await User.findByPk(id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
     const cart = await Cart.findOne({
-      where: { userId: id },
+      where: { tokenSession: req.headers.authorization.split(" ")[1] },
       include: Product,
     });
 
@@ -31,13 +25,13 @@ router.get("/:id", async function (req, res) {
 // Function to add a product to the cart
 router.post("/add-product", async function (req, res) {
   try {
-    const { userId, productId } = req.body;
+    const { productId } = req.body;
     var quantity = req.body.quantity;
 
-    if (!userId || !productId || !quantity) {
+    if (!productId || !quantity) {
       return res
         .status(400)
-        .json({ message: "userId, productId and quantity are required" });
+        .json({ message: "productId and quantity are required" });
     }
 
     const product = await Product.findByPk(productId);
@@ -47,15 +41,17 @@ router.post("/add-product", async function (req, res) {
     }
 
     let cart = await Cart.findOne({
-      where: { UserId: userId },
+      where: { tokenSession: req.headers.authorization.split(" ")[1] },
       include: Product,
     });
 
     if (!cart) {
-      cart = await Cart.create({ UserId: userId });
+      cart = await Cart.create({
+        tokenSession: req.headers.authorization.split(" ")[1],
+      });
     }
 
-    if (cart.UserId !== userId) {
+    if (cart.tokenSession !== req.headers.authorization.split(" ")[1]) {
       return res.status(403).json({ message: "This is not your cart" });
     }
 
@@ -94,12 +90,7 @@ router.post("/add-product", async function (req, res) {
 router.delete("/:id/product/:productId", async function (req, res) {
   try {
     const { id, productId } = req.params;
-    const userId = req.body.userId;
     var quantity = req.body.quantity || null;
-
-    if (!userId) {
-      return res.status(400).json({ message: "userId is required" });
-    }
 
     const cart = await Cart.findByPk(id);
     const product = await Product.findByPk(productId);
